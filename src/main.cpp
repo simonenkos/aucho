@@ -21,6 +21,7 @@ awaitable<void> echo_once(tcp::socket& socket)
 {
     char data[128];
     std::size_t n = co_await socket.async_read_some(boost::asio::buffer(data), use_awaitable);
+    std::cout << "REPLY: " << data << std::endl;
     co_await async_write(socket, boost::asio::buffer(data, n), use_awaitable);
 }
 

@@ -1,5 +1,0 @@
-[settings]
-compiler=Visual Studio
-compiler.runtime=MD
-compiler.version=16
-compiler.cppstd=20
