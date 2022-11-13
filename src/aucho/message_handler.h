@@ -3,6 +3,8 @@
 
 #include <boost/asio/awaitable.hpp>
 
+#include <array>
+
 namespace aucho
 {
 

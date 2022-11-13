@@ -4,6 +4,8 @@
 
 #include <aucho/command_processor.h>
 
+#include <ranges>
+
 namespace aucho
 {
 
@@ -80,8 +82,8 @@ std::tuple<message_t, size_t> command_processor_t::handle_message(uint64_t conne
 
 void command_processor_t::print_command_registry_info(std::ostream & output) const
 {
-    output << "Commands description:\n";
-    output << boost::format("%-10s : %s") % "info" % "show commands description to use on Auction House\n";
+    output << "Commands description:\n\r";
+    output << boost::format("%-10s : %s") % "info" % "show commands description to use on Auction House\n\r";
 
     for (const auto & [command_name, command_ptr] : _command_registry)
     {

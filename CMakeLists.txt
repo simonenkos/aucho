@@ -17,7 +17,7 @@ include(CheckIncludeFileCXX)
 include(CheckCXXCompilerFlag)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
-    check_cxx_compiler_flag("-std=c++20"      SUPPORT_CPP20)
+    check_cxx_compiler_flag("-std=c++20" SUPPORT_CPP20)
     check_cxx_compiler_flag("-fcoroutines-ts" SUPPORT_COROUTINES)
     check_include_file_cxx("experimental/coroutine" HAS_COROUTINES_HEADER "-std=c++20")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines-ts")
@@ -28,9 +28,9 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES GNU)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines")
 elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     check_cxx_compiler_flag("/std:c++20" SUPPORT_CPP20)
-    check_cxx_compiler_flag("/await"     SUPPORT_COROUTINES)
+    check_cxx_compiler_flag("/await:strict" SUPPORT_COROUTINES)
     check_include_file_cxx("coroutine" HAS_COROUTINES_HEADER "/std:c++20")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /await")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /await:strict")
 endif()
 
 if(NOT SUPPORT_CPP20)
@@ -66,7 +66,7 @@ add_executable(aucho src/main.cpp
                      src/aucho/account_manager.cpp
                      src/aucho/command_processor.cpp
                      src/aucho/market.cpp
-    src/aucho/timer.cpp
+                     src/aucho/timer.cpp
                      src/aucho/server.cpp)
 
 target_link_libraries(aucho Threads::Threads ${CONAN_LIBS})
