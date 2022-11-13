@@ -1,75 +1,53 @@
-#include <iostream>
-
 #include <boost/asio/co_spawn.hpp>
 #include <boost/asio/detached.hpp>
 #include <boost/asio/io_context.hpp>
-#include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/signal_set.hpp>
 #include <boost/asio/write.hpp>
 
-#include <coroutine>
-#include <cstdio>
+#include <aucho/commands/account_command.h>
+#include <aucho/commands/account_operations_command.h>
+#include <aucho/commands/deposit_operation.h>
+#include <aucho/commands/withdraw_operation.h>
+#include <aucho/commands/sell_command.h>
+#include <aucho/commands/buy_command.h>
+#include <aucho/commands/list_command.h>
+#include <aucho/commands/status_command.h>
+#include <aucho/command_processor.h>
+#include <aucho/server.h>
+#include <aucho/market.h>
+#include <aucho/timer.h>
 
-using boost::asio::ip::tcp;
-using boost::asio::awaitable;
-using boost::asio::co_spawn;
-using boost::asio::detached;
-using boost::asio::use_awaitable;
-namespace this_coro = boost::asio::this_coro;
-
-awaitable<void> echo_once(tcp::socket& socket)
-{
-    char data[128];
-    std::size_t n = co_await socket.async_read_some(boost::asio::buffer(data), use_awaitable);
-    std::cout << "REPLY: " << data << std::endl;
-    co_await async_write(socket, boost::asio::buffer(data, n), use_awaitable);
-}
-
-awaitable<void> echo(tcp::socket socket)
-{
-    try
-    {
-        for (;;)
-        {
-            // The asynchronous operations to echo a single chunk of data have been
-            // refactored into a separate function. When this function is called, the
-            // operations are still performed in the context of the current
-            // coroutine, and the behaviour is functionally equivalent.
-            co_await echo_once(socket);
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::printf("echo Exception: %s\n", e.what());
-    }
-}
-
-awaitable<void> listener()
-{
-    auto executor = co_await this_coro::executor;
-    tcp::acceptor acceptor(executor, {tcp::v4(), 55555});
-    for (;;)
-    {
-        tcp::socket socket = co_await acceptor.async_accept(use_awaitable);
-        co_spawn(executor, echo(std::move(socket)), detached);
-    }
-}
+constexpr uint32_t market_fee = 10U;
 
 int main()
 {
-    try
-    {
-        boost::asio::io_context io_context(1);
+    boost::asio::io_context io_context {};
+    boost::asio::signal_set signals(io_context, SIGINT, SIGTERM);
 
-        boost::asio::signal_set signals(io_context, SIGINT, SIGTERM);
-        signals.async_wait([&](auto, auto){ io_context.stop(); });
+    signals.async_wait([&](auto, auto) {
+        io_context.stop();
+    });
 
-        co_spawn(io_context, listener(), detached);
+    using namespace std::chrono_literals;
 
-        io_context.run();
-    }
-    catch (std::exception& e)
-    {
-        std::printf("Exception: %s\n", e.what());
-    }
+    aucho::account_manager_t account_manager {};
+    aucho::market_t market { market_fee };
+    aucho::timer_t selling_timer { &io_context, 5min };
+    aucho::command_processor_t command_processor {};
+
+    command_processor
+        .register_command(std::make_unique<aucho::commands::account_command_t>(&account_manager))
+        .register_command(std::make_unique<aucho::commands::account_operations_command_t<aucho::commands::deposit_operation_t>>(&account_manager))
+        .register_command(std::make_unique<aucho::commands::account_operations_command_t<aucho::commands::withdraw_operation_t>>(&account_manager))
+        .register_command(std::make_unique<aucho::commands::sell_command_t>(&account_manager, &market, &selling_timer))
+        .register_command(std::make_unique<aucho::commands::buy_command_t>(&account_manager, &market))
+        .register_command(std::make_unique<aucho::commands::list_command_t>(&market))
+        .register_command(std::make_unique<aucho::commands::status_command_t>(&account_manager));
+
+    aucho::server server { 55555, &command_processor };
+
+    co_spawn(io_context, server.run(), boost::asio::detached);
+
+    io_context.run();
+    return 0;
 }

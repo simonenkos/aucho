@@ -26,30 +26,27 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES GNU)
     check_cxx_compiler_flag("-fcoroutines" SUPPORT_COROUTINES)
     check_include_file_cxx("coroutine" HAS_COROUTINES_HEADER "-std=gnu++20 -fcoroutines")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines")
-elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVS)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     check_cxx_compiler_flag("/std:c++20" SUPPORT_CPP20)
     check_cxx_compiler_flag("/await"     SUPPORT_COROUTINES)
     check_include_file_cxx("coroutine" HAS_COROUTINES_HEADER "/std:c++20")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /await")
 endif()
 
-#if(NOT SUPPORT_CPP20)
-#    message(FATAL_ERROR "C++20 is not supported by compiler")
-#elseif(NOT SUPPORT_COROUTINES OR NOT HAS_COROUTINES_HEADER)
-#    message(FATAL_ERROR "Coroutines are not supported by compiler")
-#endif()
-
-#if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines-ts")
-#else()
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines")
-#endif()
+if(NOT SUPPORT_CPP20)
+    message(FATAL_ERROR "C++20 is not supported by compiler")
+elseif(NOT SUPPORT_COROUTINES OR NOT HAS_COROUTINES_HEADER)
+    message(FATAL_ERROR "Coroutines are not supported by compiler")
+endif()
 
 find_program(CONAN_CMD conan REQUIRED)
 message("CONAN_CMD is ${CONAN_CMD}")
 
 execute_process(COMMAND
-                ${CONAN_CMD} install ${CMAKE_SOURCE_DIR} -if ${CMAKE_BINARY_DIR} -pr ${PROFILES_DIR}/${COMPILER_ID} -pr ${PROFILES_DIR}/${BUILD_TYPE} -pr ${PROFILES_DIR}/${SYSTEM_NAME} --build=missing)
+                ${CONAN_CMD} install ${CMAKE_SOURCE_DIR} -if ${CMAKE_BINARY_DIR} --build=missing
+                -pr ${PROFILES_DIR}/${COMPILER_ID}
+                -pr ${PROFILES_DIR}/${BUILD_TYPE}
+                -pr ${PROFILES_DIR}/${SYSTEM_NAME})
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
@@ -57,5 +54,19 @@ conan_basic_setup()
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-add_executable(aucho src/main.cpp) #src/aucho/account.h src/aucho/account_manager.h src/aucho/server.h src/aucho/server.cpp
-target_link_libraries(aucho ${Boost_LIBRARIES} Threads::Threads)
+include_directories(src/)
+
+add_executable(aucho src/main.cpp
+                     src/aucho/commands/account_command.cpp
+                     src/aucho/commands/buy_command.cpp
+                     src/aucho/commands/sell_command.cpp
+                     src/aucho/commands/list_command.cpp
+                     src/aucho/commands/status_command.cpp
+                     src/aucho/account.cpp
+                     src/aucho/account_manager.cpp
+                     src/aucho/command_processor.cpp
+                     src/aucho/market.cpp
+    src/aucho/timer.cpp
+                     src/aucho/server.cpp)
+
+target_link_libraries(aucho Threads::Threads ${CONAN_LIBS})

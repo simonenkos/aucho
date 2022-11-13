@@ -2,23 +2,38 @@
 #define AUCHO_ACCOUNT_H
 
 #include <string>
+#include <set>
 
 namespace aucho {
 
-class account {
+class account_t {
 
     std::string _name;
 
+    uint32_t _funds { 0 };
+    std::set<std::string> _items {};
+
 public:
-    explicit account(const std::string & name);
+    explicit account_t(const std::string & name);
 
-    account(const account & other) = default;
-    account(account && other) noexcept = default;
+    account_t(const account_t & other) = default;
+    account_t(account_t && other) noexcept = default;
 
-    account & operator=(const account & other) = default;
-    account & operator=(account && other) noexcept = default;
+    account_t & operator=(const account_t & other) = default;
+    account_t & operator=(account_t && other) noexcept = default;
 
-    ~account() = default;
+    ~account_t() = default;
+
+    [[nodiscard]] const std::string & name() const;
+
+    void add_to_fund(uint32_t value);
+    [[nodiscard]] uint32_t get_funds_amount() const;
+    bool remove_from_fund(uint32_t value);
+
+    bool add_item(const std::string & item);
+    bool has_item(const std::string & item) const;
+    void log_all_items(std::ostream & output) const;
+    bool remove_item(const std::string & item);
 };
 
 } // namespace aucho
