@@ -23,11 +23,11 @@ void account_command_t::invoke(uint64_t lease_id,
 {
     if (arguments.empty())
     {
-        output << "Missing account name\n";
+        output << "Missing account name\n\r";
     }
     else if (arguments.size() > 1)
     {
-        output << "Wrong amount of arguments for 'account' command\n";
+        output << "Wrong amount of arguments for 'account' command\n\r";
     }
     else
     {
@@ -38,17 +38,17 @@ void account_command_t::invoke(uint64_t lease_id,
             if (account_name == account_ptr->name())
                 return;
 
-            output << "Closing account '" << account_ptr->name() << "'\n";
+            output << "Closing account '" << account_ptr->name() << "'\n\r";
             _account_manager_ptr->close_account_session(lease_id);
         }
 
         if (_account_manager_ptr->open_account(lease_id, account_name))
         {
-            output << "New account '" << account_name << "' created\n";
+            output << "New account '" << account_name << "' created\n\r";
         }
         else
         {
-            output << "Account '" << account_name << "' opened\n";
+            output << "Account '" << account_name << "' opened\n\r";
         }
     }
 }

@@ -54,13 +54,13 @@ private:
 
         if (!account_ptr)
         {
-            output << "No account selected for deposit\n";
+            output << "No account selected for deposit\n\r";
             return;
         }
 
         if (arguments.empty())
         {
-            output << "Missing deposit type: 'fund' or 'item'\n";
+            output << "Missing deposit type: 'fund' or 'item'\n\r";
             return;
         }
 
@@ -71,18 +71,18 @@ private:
             if (arguments.size() == 2)
                 operation_impl_t::operation_on_fund(account_ptr, output, arguments[1]);
             else
-                output << "Invalid arguments\n";
+                output << "Invalid arguments\n\r";
         }
         else if (type == "item")
         {
             if (arguments.size() == 2)
                 operation_impl_t::operation_on_item(account_ptr, output, arguments[1]);
             else
-                output << "Invalid arguments\n";
+                output << "Invalid arguments\n\r";
         }
         else
         {
-            output << "Unknown deposit type: " << type << std::endl;
+            output << "Unknown deposit type: " << type << "\n\r";
         }
     }
 };

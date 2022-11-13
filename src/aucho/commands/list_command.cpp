@@ -21,12 +21,12 @@ void list_command_t::invoke(uint64_t lease_id, const std::vector<std::string> & 
     const auto & items_on_sale = _market_ptr->get_items_on_sale();
 
     if (items_on_sale.empty())
-        output << "No active sales\n";
+        output << "No active sales\n\r";
     else
     {
-        output << "Active sales:\n";
+        output << "Active sales:\n\r";
         for (const auto & sale_entry: _market_ptr->get_items_on_sale())
-            output << "Item: '" << sale_entry.first << "'; Price: '" << sale_entry.second._price << "';\n";
+            output << "Item: '" << sale_entry.first << "'; Price: '" << sale_entry.second._price << "';\n\r";
     }
 }
 

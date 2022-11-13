@@ -26,20 +26,20 @@ struct deposit_operation_t
         {
             auto integer_value = boost::lexical_cast<uint32_t>(value);
             account_ptr->add_to_fund(integer_value);
-            output << "Added '" << value << "' to account funds\n";
+            output << "Added '" << value << "' to account funds\n\r";
         }
         catch (...)
         {
-            output << "Failed to add fund due to error\n";
+            output << "Failed to add fund due to error\n\r";
         }
     }
 
     static void operation_on_item(account_t * account_ptr, std::ostream & output, const std::string & value)
     {
         if (account_ptr->add_item(value))
-            output << "Added item '" << value << "' to account '" << account_ptr->name() << "'\n";
+            output << "Added item '" << value << "' to account '" << account_ptr->name() << "'\n\r";
         else
-            output << "Item '" << value << "' already exists\n";
+            output << "Item '" << value << "' already exists\n\r";
     }
 };
 

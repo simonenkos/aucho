@@ -2,8 +2,6 @@
 
 #include <boost/lexical_cast.hpp>
 
-#include <iostream>
-
 namespace aucho::commands
 {
 
@@ -30,13 +28,13 @@ void sell_command_t::invoke(uint64_t lease_id, const std::vector<std::string> & 
 
     if (!seller_account_ptr)
     {
-        output << "No account selected\n";
+        output << "No account selected\n\r";
         return;
     }
 
     if (arguments.size() != 2)
     {
-        output << "Missing argument for sell command. Usage: sell <item> <sell_price>\n";
+        output << "Missing argument for sell command. Usage: sell <item> <sell_price>\n\r";
         return;
     }
 
@@ -46,13 +44,12 @@ void sell_command_t::invoke(uint64_t lease_id, const std::vector<std::string> & 
 
         _timer_ptr->start_timer(
             [this, seller_account_ptr, item = arguments[0]]() {
-                std::cout << "TIMEOUT" << std::endl;
                 _market_ptr->cancel_item_sale(seller_account_ptr, item);
             });
     }
     catch (std::exception & error)
     {
-        output << "Failed to process 'sell' command due to an error: " << error.what() << std::endl;
+        output << "Failed to process 'sell' command due to an error: " << error.what() << "\n\r";
     }
 }
 

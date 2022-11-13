@@ -24,13 +24,13 @@ void buy_command_t::invoke(uint64_t lease_id, const std::vector<std::string> & a
 
     if (!buyer_account_ptr)
     {
-        output << "No account selected\n";
+        output << "No account selected\n\r";
         return;
     }
 
     if (arguments.size() != 1)
     {
-        output << "Missing argument for buy command. Usage: buy <item>\n";
+        output << "Missing argument for buy command. Usage: buy <item>\n\r";
         return;
     }
 
@@ -40,7 +40,7 @@ void buy_command_t::invoke(uint64_t lease_id, const std::vector<std::string> & a
     }
     catch (std::exception & error)
     {
-        output << "Failed to process 'buy' command due to an error: " << error.what() << std::endl;
+        output << "Failed to process 'buy' command due to an error: " << error.what() << "\n\r";
     }
 }
 

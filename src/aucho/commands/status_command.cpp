@@ -22,14 +22,14 @@ void status_command_t::invoke(uint64_t lease_id, const std::vector<std::string> 
 
     if (!account_ptr)
     {
-        output << "No account selected" << std::endl;
+        output << "No account selected\n\r";
         return;
     }
 
-    output << "Account status:\n";
+    output << "Account status:\n\r";
     output << "Funds: '" << account_ptr->get_funds_amount() << "'; Items: ";
     account_ptr->log_all_items(output);
-    output << "\n";
+    output << "\n\r";
 }
 
 } // namespace aucho::commands

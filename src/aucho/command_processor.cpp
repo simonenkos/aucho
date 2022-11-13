@@ -23,7 +23,7 @@ std::tuple<message_t, size_t> command_processor_t::initialize(uint64_t connectio
     boost::iostreams::stream<boost::iostreams::basic_array_sink<char>> output { reinterpret_cast<char *>(output_message.data()),
                                                                                 output_message.size() };
 
-    output << "Welcome to Auction House!" << std::endl;
+    output << "Welcome to Auction House!\n\r";
     print_command_registry_info(output);
 
     return { output_message, boost::iostreams::seek(output, 0, std::ios_base::end) };
@@ -62,18 +62,18 @@ std::tuple<message_t, size_t> command_processor_t::handle_message(uint64_t conne
 
                 it->second->invoke(connection_id, { arguments_range.begin(), arguments_range.end() }, output);
 
-                output << "OK\n\n";
+                output << "OK\n\n\r";
             }
             else if (!cmd.empty())
             {
-                output << "Unknown command: '" << cmd << "'\n";
+                output << "Unknown command: '" << cmd << "'\n\r";
                 print_command_registry_info(output);
             }
         }
     }
     catch (const std::exception & error)
     {
-        output << "Failed to process command: " << error.what() << std::endl;
+        output << "Failed to process command: " << error.what() << "\n\r";
         print_command_registry_info(output);
     }
 
@@ -87,7 +87,7 @@ void command_processor_t::print_command_registry_info(std::ostream & output) con
 
     for (const auto & [command_name, command_ptr] : _command_registry)
     {
-        output << boost::format("%-10s : %s") % command_name % command_ptr->description() << std::endl;;
+        output << boost::format("%-10s : %s") % command_name % command_ptr->description() << "\n\r";;
     }
 }
 

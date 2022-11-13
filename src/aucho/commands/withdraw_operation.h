@@ -26,22 +26,22 @@ struct withdraw_operation_t
         {
             auto integer_value = boost::lexical_cast<uint32_t>(value);
             if (account_ptr->remove_from_fund(integer_value))
-                output << "Remove '" << value << "' from account funds\n";
+                output << "Remove '" << value << "' from account funds\n\r";
             else
-                output << "Not enough funds to withdraw '" << value << "' amount\n";
+                output << "Not enough funds to withdraw '" << value << "' amount\n\r";
         }
         catch (...)
         {
-            output << "Failed to remove fund due to error\n";
+            output << "Failed to remove fund due to error\n\r";
         }
     }
 
     static void operation_on_item(account_t * account_ptr, std::ostream & output, const std::string & value)
     {
         if (account_ptr->remove_item(value))
-            output << "Removed item '" << value << "' from account '" << account_ptr->name() << "'\n";
+            output << "Removed item '" << value << "' from account '" << account_ptr->name() << "'\n\r";
         else
-            output << "Item '" << value << "' doesn't exist on this account '" << account_ptr->name() << "'\n";
+            output << "Item '" << value << "' doesn't exist on this account '" << account_ptr->name() << "'\n\r";
     }
 };
 
